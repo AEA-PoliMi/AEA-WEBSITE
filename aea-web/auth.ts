@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
-import AzureAD from "next-auth/providers/azure-ad";
 import { JWT } from "next-auth/jwt";
+import { authConfig } from "./auth.config";
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
@@ -41,19 +41,9 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [
-    AzureAD({
-      clientId: process.env.AZURE_AD_CLIENT_ID!,
-      clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
-      issuer: `https://login.microsoftonline.com/${process.env.AZURE_AD_TENANT_ID}/v2.0`,
-      authorization: {
-        params: {
-          scope: "openid profile email offline_access User.Read GroupMember.Read.All Mail.Read Sites.Read.All",
-        },
-      },
-    }),
-  ],
+  ...authConfig,
   callbacks: {
+    ...authConfig.callbacks,
     async signIn({ user }) {
       if (!user.email) return false;
       const emailDomain = user.email.split("@")[1]?.toLowerCase();
@@ -113,4 +103,4 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
   },
-});
+}); 
