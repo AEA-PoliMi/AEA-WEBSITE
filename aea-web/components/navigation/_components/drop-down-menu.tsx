@@ -98,7 +98,6 @@ const DropdownMenu: React.FC<DropDownMenuProps> = ({ onClose }) => {
               type="submit"
               variant={"outline"}
               className="w-full"
-              onClick={handleLinkClick}
             >
               Log in
             </Button>
