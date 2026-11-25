@@ -45,7 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     AzureAD({
       clientId: process.env.AZURE_AD_CLIENT_ID!,
       clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
-      tenantId: process.env.AZURE_AD_TENANT_ID!,
+      issuer: `https://login.microsoftonline.com/${process.env.AZURE_AD_TENANT_ID}/v2.0`,
       authorization: {
         params: {
           scope: "openid profile email offline_access User.Read GroupMember.Read.All Mail.Read Sites.Read.All",
@@ -97,7 +97,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
 
       if (token.expiresAt && Date.now() < (token.expiresAt - 60) * 1000) {
-        return token; 
+        return token;
       }
 
       return await refreshAccessToken(token);
