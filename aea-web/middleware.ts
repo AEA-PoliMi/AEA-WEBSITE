@@ -1,17 +1,13 @@
+import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { authConfig } from "./auth.config";
 
-export async function middleware(req: NextRequest) {
+const { auth } = NextAuth(authConfig);
+
+export default auth((req) => {
   const { nextUrl } = req;
-
-  const token = await getToken({
-    req,
-    secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
-  });
-
-  const isLoggedIn = !!token;
-  const userRole = (token?.role as string | undefined) ?? undefined;
+  const isLoggedIn = !!req.auth;
+  const userRole = req.auth?.user?.role;
 
   const isDashboardArea = nextUrl.pathname.startsWith("/dashboard");
   const isAdminArea = nextUrl.pathname.startsWith("/dashboard/admin");
@@ -36,8 +32,8 @@ export async function middleware(req: NextRequest) {
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/auth-redirect"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
